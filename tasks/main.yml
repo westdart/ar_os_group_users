@@ -1,0 +1,23 @@
+---
+- name: Check if group already exists ({{ ar_os_group_users_group_name }})
+  shell: oc get groups -o jsonpath='{.items[*].metadata.name}'
+  register: groups_stat
+  changed_when: false
+  failed_when: false
+
+- name: Create the group {{ ar_os_group_users_group_name }}
+  command: oc adm groups new {{ ar_os_group_users_group_name }}
+  when: ar_os_group_users_group_name not in groups_stat.stdout_lines[0].split(' ')
+
+- name: Get users assigned to group ({{ ar_os_group_users_group_name }})
+  shell: oc get group {{ ar_os_group_users_group_name }} -o jsonpath='{.users[*]}'
+  register: members_stat
+  changed_when: false
+  failed_when: false
+
+- name: Assign users to group {{ ar_os_group_users_group_name }}
+  command: oc adm groups add-users {{ ar_os_group_users_group_name }} {{ ar_os_group_users_item }}
+  when: members_stat.stdout_lines | length == 0 or ar_os_group_users_item not in members_stat.stdout_lines[0].split(' ')
+  with_items: "{{ ar_os_group_users_members }}"
+  loop_control:
+    loop_var: ar_os_group_users_item
