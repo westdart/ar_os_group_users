@@ -24,6 +24,9 @@ The following details:
 | --------                     | -----------                              | -------                                    |
 | ar_os_group_users_assertions | List of assertions made before execution | 'ar_os_group_users_group_name' is provided |
 
+### Secrets
+The following variables should be provided through an encrypted source:
+
 ## Dependencies
 None
 
